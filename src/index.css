@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Merriweather:wght@400;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-primary: var(--primary, #2563eb);
+  --color-secondary: var(--secondary, #1e3a8a);
+}
+
+body {
+  font-family: var(--font-family, 'Inter', sans-serif);
+  color: var(--text-color, #1f2937);
+}
+
+/* Add some base prose styles for the blog/about content */
+.prose p {
+  margin-bottom: 1.5em;
+}
+.prose h3 {
+  font-size: 1.5em;
+  font-weight: 700;
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+.prose blockquote {
+  border-left-width: 4px;
+  padding-left: 1.5em;
+  font-style: italic;
+  color: #4b5563;
+}
+
