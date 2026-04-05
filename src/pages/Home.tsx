@@ -21,6 +21,7 @@ export default function Home() {
             src={content.home.heroImage}
             alt="Environmental Landscape"
             className="w-full h-full object-cover opacity-40"
+            referrerPolicy="no-referrer"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-900/80 to-transparent"></div>
         </div>

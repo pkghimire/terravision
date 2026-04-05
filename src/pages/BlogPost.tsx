@@ -22,6 +22,7 @@ export default function BlogPost() {
             src={`https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2000&auto=format&fit=crop&sig=${post.id}`}
             alt={post.title}
             className="w-full h-full object-cover opacity-30"
+            referrerPolicy="no-referrer"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent"></div>
         </div>

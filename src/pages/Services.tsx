@@ -45,6 +45,7 @@ export default function Services() {
                       src={`https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&auto=format&fit=crop&sig=${index}`} 
                       alt={service.title}
                       className="object-cover w-full h-full"
+                      referrerPolicy="no-referrer"
                     />
                   </div>
                 </div>

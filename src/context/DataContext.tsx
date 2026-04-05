@@ -196,30 +196,49 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const contentDoc = doc(db, 'content', 'main');
-    
-    const unsubscribe = onSnapshot(contentDoc, (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.data() as SiteContent;
-        setContent({
-          ...defaultContent,
-          ...data,
-          theme: { ...defaultContent.theme, ...data.theme },
-          home: { ...defaultContent.home, ...data.home },
-          about: { ...defaultContent.about, ...data.about },
-          services: data.services || defaultContent.services,
-          blog: data.blog || defaultContent.blog,
-        });
-      } else {
-        // Initialize with default content if it doesn't exist
-        setDoc(contentDoc, defaultContent).catch(err => handleFirestoreError(err, OperationType.WRITE, 'content/main'));
-      }
-      setLoading(false);
-    }, (error) => {
-      handleFirestoreError(error, OperationType.GET, 'content/main');
+    const sections: (keyof SiteContent)[] = ['theme', 'home', 'about', 'services', 'blog'];
+    const unsubscribes: (() => void)[] = [];
+    const loadedStatus: Record<string, boolean> = {};
+
+    sections.forEach(section => {
+      const sectionDoc = doc(db, 'content', section);
+      const unsubscribe = onSnapshot(sectionDoc, (snapshot) => {
+        if (snapshot.exists()) {
+          const sectionData = snapshot.data();
+          // Unwrap array if it was wrapped in an object
+          const finalData = (sectionData && sectionData.items && Array.isArray(sectionData.items)) 
+            ? sectionData.items 
+            : sectionData;
+            
+          setContent(prev => ({
+            ...prev,
+            [section]: finalData
+          }));
+        } else {
+          // Initialize section with default if it doesn't exist AND user is admin
+          // This prevents permission errors for public visitors
+          if (auth.currentUser?.email === 'payas4goog@gmail.com') {
+            const dataToSave = Array.isArray(defaultContent[section]) 
+              ? { items: defaultContent[section] } 
+              : defaultContent[section];
+              
+            setDoc(sectionDoc, dataToSave).catch(err => 
+              handleFirestoreError(err, OperationType.WRITE, `content/${section}`)
+            );
+          }
+        }
+        
+        loadedStatus[section] = true;
+        if (Object.keys(loadedStatus).length === sections.length) {
+          setLoading(false);
+        }
+      }, (error) => {
+        handleFirestoreError(error, OperationType.GET, `content/${section}`);
+      });
+      unsubscribes.push(unsubscribe);
     });
 
-    return () => unsubscribe();
+    return () => unsubscribes.forEach(unsub => unsub());
   }, []);
 
   useEffect(() => {
@@ -233,15 +252,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [content]);
 
   const updateContent = async (section: keyof SiteContent, data: any) => {
-    const newContent = {
-      ...content,
-      [section]: data
-    };
-    
     try {
-      await setDoc(doc(db, 'content', 'main'), newContent);
+      // Firestore documents must be objects, so wrap arrays
+      const dataToSave = Array.isArray(data) ? { items: data } : data;
+      await setDoc(doc(db, 'content', section), dataToSave);
     } catch (error) {
-      handleFirestoreError(error, OperationType.WRITE, 'content/main');
+      handleFirestoreError(error, OperationType.WRITE, `content/${section}`);
     }
   };
 

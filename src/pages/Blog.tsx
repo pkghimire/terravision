@@ -78,6 +78,7 @@ export default function Blog() {
                       src={`https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop&sig=${post.id}`} 
                       alt={post.title}
                       className="object-cover w-full h-full"
+                      referrerPolicy="no-referrer"
                     />
                   </div>
                   <div className="p-6 flex-1 flex flex-col">

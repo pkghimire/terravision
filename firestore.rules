@@ -6,13 +6,7 @@ service cloud.firestore {
     // ===============================================================
     //
     // Collection: content
-    // Document ID: main
-    // Fields:
-    //   - theme: map (required)
-    //   - home: map (required)
-    //   - about: map (required)
-    //   - services: list (required)
-    //   - blog: list (required)
+    // Document ID: theme, home, about, services, blog
     //
     // ===============================================================
 
@@ -29,22 +23,13 @@ service cloud.firestore {
         (request.auth.token.email == "payas4goog@gmail.com" && request.auth.token.email_verified == true);
     }
 
-    function isValidContent(data) {
-      return data.keys().hasAll(['theme', 'home', 'about', 'services', 'blog']) &&
-             data.theme is map &&
-             data.home is map &&
-             data.about is map &&
-             data.services is list &&
-             data.blog is list;
-    }
-
     // ===============================================================
     // Rules
     // ===============================================================
 
-    match /content/main {
+    match /content/{section} {
       allow read: if true;
-      allow write: if isAdmin() && isValidContent(request.resource.data);
+      allow write: if isAdmin();
     }
 
     // Default deny

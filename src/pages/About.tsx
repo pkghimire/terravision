@@ -30,7 +30,7 @@ export default function About() {
       {/* Main Content */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="prose prose-lg text-gray-600">
               {content.about.content.split('\n\n').map((paragraph, index) => (
                 <p key={index} className="mb-6 leading-relaxed">
@@ -38,8 +38,18 @@ export default function About() {
                 </p>
               ))}
             </div>
-            <div>
-              <div className="bg-gray-50 rounded-2xl p-8 mb-8 border border-gray-100">
+            <div className="space-y-8">
+              {content.about.aboutImage && (
+                <div className="rounded-2xl overflow-hidden shadow-lg mb-8 h-80">
+                  <img 
+                    src={content.about.aboutImage} 
+                    alt="Terra Vision Team" 
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+              )}
+              <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 rounded-full flex items-center justify-center mr-4 text-white" style={{ backgroundColor: content.theme.primaryColor }}>
                     <Target className="w-6 h-6" />
@@ -71,9 +81,9 @@ export default function About() {
             <p className="opacity-80 max-w-2xl mx-auto">The principles that guide our work and relationships.</p>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+          <div className="flex flex-wrap justify-center gap-8">
             {(content.about.coreValues || []).map((value, index) => (
-              <div key={index} className="text-center p-6 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
+              <div key={index} className="text-center p-6 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors w-full sm:w-[calc(50%-1rem)] lg:w-[calc(20%-1.6rem)]">
                 <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: content.theme.primaryColor }}>
                   {valueIcons[value] || <Shield className="w-8 h-8" />}
                 </div>
@@ -100,6 +110,7 @@ export default function About() {
                     src={member.image} 
                     alt={member.name} 
                     className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500"
+                    referrerPolicy="no-referrer"
                   />
                 </div>
                 <div className="p-6">

@@ -39,7 +39,7 @@ export default function PublicLayout() {
               <Link to="/" className="flex items-center">
                 {/* Logo */}
                 <div className="max-h-48 max-w-[300px] overflow-hidden">
-                  <img src={content.theme.logo} alt="Terra Vision Logo" className="h-full w-auto max-h-48 object-contain" />
+                  <img src={content.theme.logo} alt="Terra Vision Logo" className="h-full w-auto max-h-48 object-contain" referrerPolicy="no-referrer" />
                 </div>
               </Link>
             </div>
@@ -106,7 +106,7 @@ export default function PublicLayout() {
             <div className="col-span-1 md:col-span-1">
               <Link to="/" className="flex items-center mb-2">
                 <div className="max-h-40 max-w-[250px] overflow-hidden">
-                  <img src={content.theme.logo} alt="Terra Vision Logo" className="h-full w-auto max-h-40 object-contain" />
+                  <img src={content.theme.logo} alt="Terra Vision Logo" className="h-full w-auto max-h-40 object-contain" referrerPolicy="no-referrer" />
                 </div>
               </Link>
               <p className="text-sm mb-6 opacity-80" style={{ color: content.theme.onSecondaryColor }}>

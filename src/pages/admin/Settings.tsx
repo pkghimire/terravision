@@ -11,6 +11,10 @@ export default function Settings() {
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 200000) { // ~200KB for logo
+        alert('Logo is too large. Please choose an image under 200KB.');
+        return;
+      }
       const reader = new FileReader();
       reader.onloadend = () => {
         setTheme({ ...theme, logo: reader.result as string });
@@ -152,7 +156,7 @@ export default function Settings() {
           
           {theme.logo && (
             <div className="mt-4 p-4 border border-gray-100 rounded bg-gray-50 flex items-center justify-center">
-              <img src={theme.logo} alt="Logo Preview" className="h-16 object-contain" />
+              <img src={theme.logo} alt="Logo Preview" className="h-16 object-contain" referrerPolicy="no-referrer" />
             </div>
           )}
         </div>

@@ -16,6 +16,10 @@ export default function ContentEditor() {
   const handleHeroImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 800000) { // ~800KB
+        alert('Image is too large. Please choose an image under 800KB.');
+        return;
+      }
       const reader = new FileReader();
       reader.onloadend = () => {
         setHomeData({ ...homeData, heroImage: reader.result as string });
@@ -27,6 +31,10 @@ export default function ContentEditor() {
   const handleAboutImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 800000) {
+        alert('Image is too large. Please choose an image under 800KB.');
+        return;
+      }
       const reader = new FileReader();
       reader.onloadend = () => {
         setAboutData({ ...aboutData, aboutImage: reader.result as string });
@@ -39,13 +47,11 @@ export default function ContentEditor() {
     setIsSaving(true);
     
     try {
-      if (activeTab === 'home') {
-        await updateContent('home', homeData);
-      } else if (activeTab === 'about') {
-        await updateContent('about', aboutData);
-      } else if (activeTab === 'services') {
-        await updateContent('services', servicesData);
-      }
+      await Promise.all([
+        updateContent('home', homeData),
+        updateContent('about', aboutData),
+        updateContent('services', servicesData)
+      ]);
       
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
@@ -147,6 +153,10 @@ export default function ContentEditor() {
   const handleTeamPhotoUpload = (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 500000) { // ~500KB for team members
+        alert('Image is too large. Please choose an image under 500KB.');
+        return;
+      }
       const reader = new FileReader();
       reader.onloadend = () => {
         updateTeamMember(id, 'image', reader.result as string);
@@ -235,7 +245,7 @@ export default function ContentEditor() {
             </div>
             {homeData.heroImage && (
               <div className="mt-2 h-32 w-full rounded overflow-hidden border border-gray-200">
-                <img src={homeData.heroImage} alt="Hero Preview" className="w-full h-full object-cover" />
+                <img src={homeData.heroImage} alt="Hero Preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
               </div>
             )}
             <div>
@@ -291,7 +301,7 @@ export default function ContentEditor() {
             </div>
             {aboutData.aboutImage && (
               <div className="mt-2 h-32 w-full rounded overflow-hidden border border-gray-200">
-                <img src={aboutData.aboutImage} alt="About Preview" className="w-full h-full object-cover" />
+                <img src={aboutData.aboutImage} alt="About Preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
               </div>
             )}
 
@@ -349,7 +359,7 @@ export default function ContentEditor() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div className="space-y-4">
                         <div className="aspect-square rounded-lg overflow-hidden border border-gray-200 bg-white">
-                          <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                          <img src={member.image} alt={member.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                         </div>
                         <div>
                           <label className="block text-xs font-medium text-gray-500 mb-1">Upload Photo</label>
