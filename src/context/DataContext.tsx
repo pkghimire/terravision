@@ -50,8 +50,8 @@ export interface SiteContent {
 
 const defaultContent: SiteContent = {
   theme: {
-    primaryColor: '#2563eb', // Blue 600
-    secondaryColor: '#1e3a8a', // Blue 900
+    primaryColor: '#4F7A28', // Green
+    secondaryColor: '#006D8F', // Blue
     textColor: '#1f2937', // Gray 800
     onSecondaryColor: '#ffffff', // White
     fontFamily: 'Inter, sans-serif',
