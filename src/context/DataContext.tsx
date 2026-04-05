@@ -15,7 +15,20 @@ export interface SiteContent {
     heroHeadline: string;
     heroSubheading: string;
     heroImage: string;
+    servicesTitle: string;
+    servicesDescription: string;
+    aboutTitle: string;
     aboutPreview: string;
+    aboutFeatures: string[];
+    sectorsTitle: string;
+    sectorsDescription: string;
+    sectors: Array<{
+      title: string;
+      description: string;
+      icon: string;
+    }>;
+    ctaTitle: string;
+    ctaDescription: string;
   };
   about: {
     content: string;
@@ -64,7 +77,32 @@ const defaultContent: SiteContent = {
     heroHeadline: 'Data-driven insights for a sustainable world',
     heroSubheading: 'Terra Vision Consult is an Australian consulting firm specializing in GIS, remote sensing, and environmental intelligence.',
     heroImage: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop',
+    servicesTitle: 'Our Core Services',
+    servicesDescription: 'We integrate advanced Geographic Information Systems (GIS), remote sensing technologies, and analytical modeling to provide accurate insights.',
+    aboutTitle: 'Bridging the gap between data and actionable strategies',
     aboutPreview: 'We deliver innovative, data-driven solutions for complex environmental and spatial challenges.',
+    aboutFeatures: ['Environmental modeling', 'Conservation planning', 'Sustainable land use planning'],
+    sectorsTitle: 'Key Sectors We Serve',
+    sectorsDescription: 'Providing specialized spatial intelligence across critical industries.',
+    sectors: [
+      {
+        title: 'Environment',
+        description: 'Conservation planning, natural hazard assessment, and ecological baselines.',
+        icon: 'Globe'
+      },
+      {
+        title: 'Agriculture',
+        description: 'Precision farming insights, crop monitoring, and sustainable land use planning.',
+        icon: 'Map'
+      },
+      {
+        title: 'Infrastructure',
+        description: 'GIS-based infrastructure planning, site selection, and impact assessments.',
+        icon: 'Layers'
+      }
+    ],
+    ctaTitle: 'Ready to leverage spatial intelligence?',
+    ctaDescription: 'Contact us today to discuss how our data-driven solutions can support your next project.'
   },
   about: {
     content: 'Terra Vision Consult is a newly established consulting firm based in Australia, founded with a vision to deliver innovative, data-driven solutions for complex environmental and spatial challenges. The firm integrates advanced Geographic Information Systems (GIS), remote sensing technologies, and analytical modeling to provide accurate insights that support informed decision-making.\n\nWith a multidisciplinary approach, Terra Vision Consult specializes in:\n- Environmental modeling\n- Hydrological analysis\n- Conservation planning\n- Natural hazard assessment\n- Sustainable land use planning\n- GIS-based infrastructure planning\n\nThe firm bridges the gap between data and actionable strategies, contributing to resilient ecosystems, sustainable development, and smarter infrastructure planning.',

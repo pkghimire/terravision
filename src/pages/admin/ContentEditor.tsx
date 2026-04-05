@@ -13,6 +13,13 @@ export default function ContentEditor() {
   const [aboutData, setAboutData] = useState(content.about);
   const [servicesData, setServicesData] = useState(content.services);
 
+  // Sync with global content when it loads or changes
+  React.useEffect(() => {
+    setHomeData(content.home);
+    setAboutData(content.about);
+    setServicesData(content.services);
+  }, [content]);
+
   const handleHeroImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -229,48 +236,239 @@ export default function ContentEditor() {
 
       <div className="p-6 flex-1 overflow-auto">
         {activeTab === 'home' && (
-          <div className="space-y-6 max-w-3xl">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Hero Headline</label>
-              <input
-                type="text"
-                value={homeData.heroHeadline}
-                onChange={(e) => setHomeData({...homeData, heroHeadline: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-slate-500 focus:border-slate-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Hero Subheading</label>
-              <textarea
-                rows={3}
-                value={homeData.heroSubheading}
-                onChange={(e) => setHomeData({...homeData, heroSubheading: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-slate-500 focus:border-slate-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Upload Local Hero Image</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleHeroImageUpload}
-                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100"
-              />
-              <p className="mt-1 text-xs text-gray-500">Upload an image from your computer to use as the hero background.</p>
-            </div>
-            {homeData.heroImage && (
-              <div className="mt-2 h-32 w-full rounded overflow-hidden border border-gray-200">
-                <img src={homeData.heroImage} alt="Hero Preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+          <div className="space-y-8 max-w-3xl pb-12">
+            <div className="space-y-6">
+              <h3 className="text-lg font-semibold border-b pb-2">Hero Section</h3>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Hero Headline</label>
+                <input
+                  type="text"
+                  value={homeData.heroHeadline}
+                  onChange={(e) => setHomeData({...homeData, heroHeadline: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-slate-500 focus:border-slate-500"
+                />
               </div>
-            )}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">About Preview Text</label>
-              <textarea
-                rows={4}
-                value={homeData.aboutPreview}
-                onChange={(e) => setHomeData({...homeData, aboutPreview: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-slate-500 focus:border-slate-500"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Hero Subheading</label>
+                <textarea
+                  rows={3}
+                  value={homeData.heroSubheading}
+                  onChange={(e) => setHomeData({...homeData, heroSubheading: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-slate-500 focus:border-slate-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Upload Local Hero Image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleHeroImageUpload}
+                  className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100"
+                />
+                <p className="mt-1 text-xs text-gray-500">Upload an image from your computer to use as the hero background.</p>
+              </div>
+              {homeData.heroImage && (
+                <div className="mt-2 h-32 w-full rounded overflow-hidden border border-gray-200">
+                  <img src={homeData.heroImage} alt="Hero Preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-6 pt-8">
+              <h3 className="text-lg font-semibold border-b pb-2">Services Overview</h3>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Section Title</label>
+                <input
+                  type="text"
+                  value={homeData.servicesTitle}
+                  onChange={(e) => setHomeData({...homeData, servicesTitle: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-slate-500 focus:border-slate-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Section Description</label>
+                <textarea
+                  rows={3}
+                  value={homeData.servicesDescription}
+                  onChange={(e) => setHomeData({...homeData, servicesDescription: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-slate-500 focus:border-slate-500"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-6 pt-8">
+              <h3 className="text-lg font-semibold border-b pb-2">About Preview Section</h3>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Section Title</label>
+                <input
+                  type="text"
+                  value={homeData.aboutTitle}
+                  onChange={(e) => setHomeData({...homeData, aboutTitle: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-slate-500 focus:border-slate-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">About Preview Text</label>
+                <textarea
+                  rows={4}
+                  value={homeData.aboutPreview}
+                  onChange={(e) => setHomeData({...homeData, aboutPreview: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-slate-500 focus:border-slate-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Key Features (List)</label>
+                <div className="space-y-2">
+                  {(homeData.aboutFeatures || []).map((feature, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <input
+                        type="text"
+                        value={feature}
+                        onChange={(e) => {
+                          const newFeatures = [...homeData.aboutFeatures];
+                          newFeatures[index] = e.target.value;
+                          setHomeData({...homeData, aboutFeatures: newFeatures});
+                        }}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-slate-500 focus:border-slate-500 text-sm"
+                      />
+                      <button
+                        onClick={() => {
+                          setHomeData({
+                            ...homeData,
+                            aboutFeatures: homeData.aboutFeatures.filter((_, i) => i !== index)
+                          });
+                        }}
+                        className="text-gray-400 hover:text-red-600"
+                      >
+                        &times;
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => setHomeData({...homeData, aboutFeatures: [...(homeData.aboutFeatures || []), 'New Feature']})}
+                    className="text-sm text-slate-600 font-medium hover:text-slate-900"
+                  >
+                    + Add Feature
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6 pt-8">
+              <h3 className="text-lg font-semibold border-b pb-2">Key Sectors Section</h3>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Section Title</label>
+                <input
+                  type="text"
+                  value={homeData.sectorsTitle}
+                  onChange={(e) => setHomeData({...homeData, sectorsTitle: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-slate-500 focus:border-slate-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Section Description</label>
+                <textarea
+                  rows={2}
+                  value={homeData.sectorsDescription}
+                  onChange={(e) => setHomeData({...homeData, sectorsDescription: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-slate-500 focus:border-slate-500"
+                />
+              </div>
+              
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium text-gray-700">Sectors</h4>
+                {(homeData.sectors || []).map((sector, index) => (
+                  <div key={index} className="p-4 border border-gray-200 rounded-md bg-gray-50 space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-xs font-bold uppercase text-gray-400">Sector {index + 1}</span>
+                      <button
+                        onClick={() => {
+                          setHomeData({
+                            ...homeData,
+                            sectors: homeData.sectors.filter((_, i) => i !== index)
+                          });
+                        }}
+                        className="text-xs text-red-600 hover:underline"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500 mb-1">Title</label>
+                      <input
+                        type="text"
+                        value={sector.title}
+                        onChange={(e) => {
+                          const newSectors = [...homeData.sectors];
+                          newSectors[index] = {...sector, title: e.target.value};
+                          setHomeData({...homeData, sectors: newSectors});
+                        }}
+                        className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500 mb-1">Description</label>
+                      <textarea
+                        rows={2}
+                        value={sector.description}
+                        onChange={(e) => {
+                          const newSectors = [...homeData.sectors];
+                          newSectors[index] = {...sector, description: e.target.value};
+                          setHomeData({...homeData, sectors: newSectors});
+                        }}
+                        className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500 mb-1">Icon</label>
+                      <select
+                        value={sector.icon}
+                        onChange={(e) => {
+                          const newSectors = [...homeData.sectors];
+                          newSectors[index] = {...sector, icon: e.target.value};
+                          setHomeData({...homeData, sectors: newSectors});
+                        }}
+                        className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm"
+                      >
+                        <option value="Globe">Globe</option>
+                        <option value="Map">Map</option>
+                        <option value="Layers">Layers</option>
+                      </select>
+                    </div>
+                  </div>
+                ))}
+                <button
+                  onClick={() => setHomeData({
+                    ...homeData,
+                    sectors: [...(homeData.sectors || []), { title: 'New Sector', description: 'Description', icon: 'Globe' }]
+                  })}
+                  className="text-sm text-slate-600 font-medium hover:text-slate-900"
+                >
+                  + Add Sector
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-6 pt-8">
+              <h3 className="text-lg font-semibold border-b pb-2">Call to Action Section</h3>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">CTA Title</label>
+                <input
+                  type="text"
+                  value={homeData.ctaTitle}
+                  onChange={(e) => setHomeData({...homeData, ctaTitle: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-slate-500 focus:border-slate-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">CTA Description</label>
+                <textarea
+                  rows={3}
+                  value={homeData.ctaDescription}
+                  onChange={(e) => setHomeData({...homeData, ctaDescription: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-slate-500 focus:border-slate-500"
+                />
+              </div>
             </div>
           </div>
         )}

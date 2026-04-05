@@ -6,10 +6,13 @@ import { useData } from '../context/DataContext';
 export default function Home() {
   const { content } = useData();
 
-  const iconMap: Record<string, React.ReactNode> = {
-    Globe: <Globe className="w-8 h-8" />,
-    Map: <Map className="w-8 h-8" />,
-    Layers: <Layers className="w-8 h-8" />
+  const renderIcon = (iconName: string, sizeClass: string = "w-8 h-8") => {
+    switch (iconName) {
+      case 'Globe': return <Globe className={sizeClass} />;
+      case 'Map': return <Map className={sizeClass} />;
+      case 'Layers': return <Layers className={sizeClass} />;
+      default: return <Globe className={sizeClass} />;
+    }
   };
 
   return (
@@ -57,9 +60,11 @@ export default function Home() {
       <section className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4" style={{ color: content.theme.secondaryColor }}>Our Core Services</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4" style={{ color: content.theme.secondaryColor }}>
+              {content.home.servicesTitle}
+            </h2>
             <p className="text-lg text-gray-600">
-              We integrate advanced Geographic Information Systems (GIS), remote sensing technologies, and analytical modeling to provide accurate insights.
+              {content.home.servicesDescription}
             </p>
           </div>
 
@@ -70,7 +75,7 @@ export default function Home() {
                   className="w-16 h-16 rounded-lg flex items-center justify-center mb-6 text-white"
                   style={{ backgroundColor: content.theme.primaryColor }}
                 >
-                  {iconMap[service.icon] || <Globe className="w-8 h-8" />}
+                  {renderIcon(service.icon)}
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-4">{service.title}</h3>
                 <p className="text-gray-600 mb-6 line-clamp-3">{service.description}</p>
@@ -92,13 +97,13 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl font-bold text-gray-900 mb-6" style={{ color: content.theme.secondaryColor }}>
-              Bridging the gap between data and actionable strategies
+              {content.home.aboutTitle}
             </h2>
             <p className="text-lg text-gray-600 mb-8 leading-relaxed">
               {content.home.aboutPreview}
             </p>
             <ul className="space-y-4 mb-10 inline-block text-left">
-              {['Environmental modeling', 'Conservation planning', 'Sustainable land use planning'].map((item, i) => (
+              {(content.home.aboutFeatures || []).map((item, i) => (
                 <li key={i} className="flex items-center text-gray-700">
                   <CheckCircle className="w-6 h-6 mr-3 flex-shrink-0" style={{ color: content.theme.primaryColor }} />
                   <span className="font-medium">{item}</span>
@@ -122,32 +127,20 @@ export default function Home() {
       <section className="py-24" style={{ backgroundColor: content.theme.secondaryColor, color: content.theme.onSecondaryColor }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Key Sectors We Serve</h2>
-            <p className="opacity-80 max-w-2xl mx-auto">Providing specialized spatial intelligence across critical industries.</p>
+            <h2 className="text-3xl font-bold mb-4">{content.home.sectorsTitle}</h2>
+            <p className="opacity-80 max-w-2xl mx-auto">{content.home.sectorsDescription}</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div className="p-6">
-              <div className="w-20 h-20 mx-auto bg-white/10 rounded-full flex items-center justify-center mb-6">
-                <Globe className="w-10 h-10" />
+            {(content.home.sectors || []).map((sector, i) => (
+              <div key={i} className="p-6">
+                <div className="w-20 h-20 mx-auto bg-white/10 rounded-full flex items-center justify-center mb-6">
+                  {renderIcon(sector.icon, "w-10 h-10")}
+                </div>
+                <h3 className="text-xl font-bold mb-3">{sector.title}</h3>
+                <p className="opacity-80">{sector.description}</p>
               </div>
-              <h3 className="text-xl font-bold mb-3">Environment</h3>
-              <p className="opacity-80">Conservation planning, natural hazard assessment, and ecological baselines.</p>
-            </div>
-            <div className="p-6">
-              <div className="w-20 h-20 mx-auto bg-white/10 rounded-full flex items-center justify-center mb-6">
-                <Map className="w-10 h-10" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Agriculture</h3>
-              <p className="opacity-80">Precision farming insights, crop monitoring, and sustainable land use planning.</p>
-            </div>
-            <div className="p-6">
-              <div className="w-20 h-20 mx-auto bg-white/10 rounded-full flex items-center justify-center mb-6">
-                <Layers className="w-10 h-10" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Infrastructure</h3>
-              <p className="opacity-80">GIS-based infrastructure planning, site selection, and impact assessments.</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -155,9 +148,11 @@ export default function Home() {
       {/* CTA Section */}
       <section className="py-24" style={{ backgroundColor: content.theme.primaryColor }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Ready to leverage spatial intelligence?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            {content.home.ctaTitle}
+          </h2>
           <p className="text-xl text-white/90 mb-10">
-            Contact us today to discuss how our data-driven solutions can support your next project.
+            {content.home.ctaDescription}
           </p>
           <Link
             to="/contact"
