@@ -1,0 +1,23 @@
+{
+  "entities": {
+    "SiteContent": {
+      "title": "Site Content",
+      "description": "The main content and theme settings for the website.",
+      "type": "object",
+      "properties": {
+        "theme": { "type": "object" },
+        "home": { "type": "object" },
+        "about": { "type": "object" },
+        "services": { "type": "array" },
+        "blog": { "type": "array" }
+      },
+      "required": ["theme", "home", "about", "services", "blog"]
+    }
+  },
+  "firestore": {
+    "/content/main": {
+      "schema": "SiteContent",
+      "description": "The single document containing all site content."
+    }
+  }
+}

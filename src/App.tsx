@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { DataProvider } from './context/DataContext';
+import { DataProvider, useData } from './context/DataContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Layouts
@@ -28,37 +28,54 @@ import BlogManager from './pages/admin/BlogManager';
 import Settings from './pages/admin/Settings';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   if (!user) return <Navigate to="/admin/login" replace />;
   return <>{children}</>;
+};
+
+const AppContent = () => {
+  const { loading } = useData();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-900"></div>
+      </div>
+    );
+  }
+
+  return (
+    <Router>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<PublicLayout />}>
+          <Route index element={<Home />} />
+          <Route path="about" element={<About />} />
+          <Route path="services" element={<Services />} />
+          <Route path="blog" element={<Blog />} />
+          <Route path="blog/:id" element={<BlogPost />} />
+          <Route path="contact" element={<Contact />} />
+        </Route>
+
+        {/* Admin Routes */}
+        <Route path="/admin/login" element={<Login />} />
+        <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+          <Route index element={<Dashboard />} />
+          <Route path="content" element={<ContentEditor />} />
+          <Route path="blog" element={<BlogManager />} />
+          <Route path="settings" element={<Settings />} />
+        </Route>
+      </Routes>
+    </Router>
+  );
 };
 
 export default function App() {
   return (
     <AuthProvider>
       <DataProvider>
-        <Router>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<PublicLayout />}>
-              <Route index element={<Home />} />
-              <Route path="about" element={<About />} />
-              <Route path="services" element={<Services />} />
-              <Route path="blog" element={<Blog />} />
-              <Route path="blog/:id" element={<BlogPost />} />
-              <Route path="contact" element={<Contact />} />
-            </Route>
-
-            {/* Admin Routes */}
-            <Route path="/admin/login" element={<Login />} />
-            <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
-              <Route index element={<Dashboard />} />
-              <Route path="content" element={<ContentEditor />} />
-              <Route path="blog" element={<BlogManager />} />
-              <Route path="settings" element={<Settings />} />
-            </Route>
-          </Routes>
-        </Router>
+        <AppContent />
       </DataProvider>
     </AuthProvider>
   );

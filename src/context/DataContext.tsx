@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { doc, onSnapshot, setDoc, getDoc } from 'firebase/firestore';
+import { db, auth } from '../firebase';
 
 export interface SiteContent {
   theme: {
@@ -130,40 +132,97 @@ const defaultContent: SiteContent = {
   ]
 };
 
+enum OperationType {
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  LIST = 'list',
+  GET = 'get',
+  WRITE = 'write',
+}
+
+interface FirestoreErrorInfo {
+  error: string;
+  operationType: OperationType;
+  path: string | null;
+  authInfo: {
+    userId: string | undefined;
+    email: string | null | undefined;
+    emailVerified: boolean | undefined;
+    isAnonymous: boolean | undefined;
+    tenantId: string | null | undefined;
+    providerInfo: {
+      providerId: string;
+      displayName: string | null;
+      email: string | null;
+      photoUrl: string | null;
+    }[];
+  }
+}
+
+function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  const errInfo: FirestoreErrorInfo = {
+    error: error instanceof Error ? error.message : String(error),
+    authInfo: {
+      userId: auth.currentUser?.uid,
+      email: auth.currentUser?.email,
+      emailVerified: auth.currentUser?.emailVerified,
+      isAnonymous: auth.currentUser?.isAnonymous,
+      tenantId: auth.currentUser?.tenantId,
+      providerInfo: auth.currentUser?.providerData.map(provider => ({
+        providerId: provider.providerId,
+        displayName: provider.displayName,
+        email: provider.email,
+        photoUrl: provider.photoURL
+      })) || []
+    },
+    operationType,
+    path
+  }
+  console.error('Firestore Error: ', JSON.stringify(errInfo));
+  throw new Error(JSON.stringify(errInfo));
+}
+
 interface DataContextType {
   content: SiteContent;
-  updateContent: (section: keyof SiteContent, data: any) => void;
+  updateContent: (section: keyof SiteContent, data: any) => Promise<void>;
+  loading: boolean;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [content, setContent] = useState<SiteContent>(() => {
-    const saved = localStorage.getItem('terra_vision_content');
-    if (!saved) return defaultContent;
-    
-    try {
-      const parsed = JSON.parse(saved);
-      
-      // Deep merge to ensure new fields (like 'team') are present even if they're missing in localStorage
-      return {
-        ...defaultContent,
-        ...parsed,
-        theme: { ...defaultContent.theme, ...parsed.theme },
-        home: { ...defaultContent.home, ...parsed.home },
-        about: { ...defaultContent.about, ...parsed.about },
-        services: parsed.services || defaultContent.services,
-        blog: parsed.blog || defaultContent.blog,
-      };
-    } catch (e) {
-      console.error("Error parsing saved content", e);
-      return defaultContent;
-    }
-  });
+  const [content, setContent] = useState<SiteContent>(defaultContent);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    localStorage.setItem('terra_vision_content', JSON.stringify(content));
+    const contentDoc = doc(db, 'content', 'main');
     
+    const unsubscribe = onSnapshot(contentDoc, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data() as SiteContent;
+        setContent({
+          ...defaultContent,
+          ...data,
+          theme: { ...defaultContent.theme, ...data.theme },
+          home: { ...defaultContent.home, ...data.home },
+          about: { ...defaultContent.about, ...data.about },
+          services: data.services || defaultContent.services,
+          blog: data.blog || defaultContent.blog,
+        });
+      } else {
+        // Initialize with default content if it doesn't exist
+        setDoc(contentDoc, defaultContent).catch(err => handleFirestoreError(err, OperationType.WRITE, 'content/main'));
+      }
+      setLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, 'content/main');
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
     // Apply theme colors to root using CSS variables
     const root = document.documentElement;
     root.style.setProperty('--primary', content.theme.primaryColor);
@@ -173,15 +232,21 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     root.style.fontFamily = content.theme.fontFamily;
   }, [content]);
 
-  const updateContent = (section: keyof SiteContent, data: any) => {
-    setContent(prev => ({
-      ...prev,
+  const updateContent = async (section: keyof SiteContent, data: any) => {
+    const newContent = {
+      ...content,
       [section]: data
-    }));
+    };
+    
+    try {
+      await setDoc(doc(db, 'content', 'main'), newContent);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, 'content/main');
+    }
   };
 
   return (
-    <DataContext.Provider value={{ content, updateContent }}>
+    <DataContext.Provider value={{ content, updateContent, loading }}>
       {children}
     </DataContext.Provider>
   );

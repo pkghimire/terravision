@@ -35,22 +35,25 @@ export default function ContentEditor() {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
     
-    setTimeout(() => {
+    try {
       if (activeTab === 'home') {
-        updateContent('home', homeData);
+        await updateContent('home', homeData);
       } else if (activeTab === 'about') {
-        updateContent('about', aboutData);
+        await updateContent('about', aboutData);
       } else if (activeTab === 'services') {
-        updateContent('services', servicesData);
+        await updateContent('services', servicesData);
       }
       
-      setIsSaving(false);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
-    }, 800);
+    } catch (error) {
+      console.error("Save error:", error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const updateService = (id: string, field: string, value: any) => {

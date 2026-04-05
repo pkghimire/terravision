@@ -8,19 +8,27 @@ export default function BlogManager() {
   const [isEditing, setIsEditing] = useState(false);
   const [currentPost, setCurrentPost] = useState<any>(null);
 
-  const togglePublish = (id: string) => {
+  const togglePublish = async (id: string) => {
     const updatedPosts = posts.map(post => 
       post.id === id ? { ...post, published: !post.published } : post
     );
     setPosts(updatedPosts);
-    updateContent('blog', updatedPosts);
+    try {
+      await updateContent('blog', updatedPosts);
+    } catch (error) {
+      console.error("Toggle publish error:", error);
+    }
   };
 
-  const deletePost = (id: string) => {
+  const deletePost = async (id: string) => {
     if (confirm('Are you sure you want to delete this post?')) {
       const updatedPosts = posts.filter(post => post.id !== id);
       setPosts(updatedPosts);
-      updateContent('blog', updatedPosts);
+      try {
+        await updateContent('blog', updatedPosts);
+      } catch (error) {
+        console.error("Delete post error:", error);
+      }
     }
   };
 
@@ -43,7 +51,7 @@ export default function BlogManager() {
     setIsEditing(true);
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     let updatedPosts;
     if (posts.find(p => p.id === currentPost.id)) {
@@ -52,9 +60,13 @@ export default function BlogManager() {
       updatedPosts = [currentPost, ...posts];
     }
     setPosts(updatedPosts);
-    updateContent('blog', updatedPosts);
-    setIsEditing(false);
-    setCurrentPost(null);
+    try {
+      await updateContent('blog', updatedPosts);
+      setIsEditing(false);
+      setCurrentPost(null);
+    } catch (error) {
+      console.error("Save post error:", error);
+    }
   };
 
   return (

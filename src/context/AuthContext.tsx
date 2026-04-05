@@ -1,38 +1,45 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { onAuthStateChanged, signOut, User, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { auth, googleProvider } from '../firebase';
 
 interface AuthContextType {
-  user: any | null;
-  login: (password: string) => boolean;
+  user: User | null;
+  login: () => Promise<boolean>;
   logout: () => void;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<any | null>(() => {
-    const saved = localStorage.getItem('terra_vision_admin');
-    return saved ? JSON.parse(saved) : null;
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const login = (password: string) => {
-    // Simple mock authentication for demo purposes
-    if (password === 'admin123') {
-      const adminUser = { id: '1', role: 'admin', name: 'Admin' };
-      setUser(adminUser);
-      localStorage.setItem('terra_vision_admin', JSON.stringify(adminUser));
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const login = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
       return true;
+    } catch (error) {
+      console.error("Login error:", error);
+      return false;
     }
-    return false;
   };
 
   const logout = () => {
-    setUser(null);
-    localStorage.removeItem('terra_vision_admin');
+    signOut(auth);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      {children}
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
+      {!loading && children}
     </AuthContext.Provider>
   );
 };

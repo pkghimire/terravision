@@ -11,12 +11,12 @@ export default function Login() {
   const { content } = useData();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (login(password)) {
+  const handleLogin = async () => {
+    const success = await login();
+    if (success) {
       navigate('/admin');
     } else {
-      setError('Invalid password. Hint: admin123');
+      setError('Login failed. Please try again.');
     }
   };
 
@@ -33,7 +33,7 @@ export default function Login() {
           </p>
         </div>
         
-        <form className="space-y-6" onSubmit={handleSubmit}>
+        <div className="space-y-6">
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
               {error}
@@ -41,32 +41,17 @@ export default function Login() {
           )}
           
           <div>
-            <label htmlFor="password" className="sr-only">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              className="appearance-none rounded-md relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:z-10 sm:text-sm"
-              style={{ focusRingColor: content.theme.primaryColor, focusBorderColor: content.theme.primaryColor }}
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-
-          <div>
             <button
-              type="submit"
+              onClick={handleLogin}
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white transition-colors"
               style={{ backgroundColor: content.theme.primaryColor }}
               onMouseOver={(e) => e.currentTarget.style.opacity = '0.9'}
               onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
             >
-              Sign in
+              Sign in with Google
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

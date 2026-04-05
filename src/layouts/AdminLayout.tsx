@@ -78,9 +78,9 @@ export default function AdminLayout() {
             {navItems.find(item => item.path === pathname)?.name || 'Admin'}
           </h2>
           <div className="flex items-center">
-            <span className="text-sm text-gray-500 mr-4">Logged in as {user?.name}</span>
+            <span className="text-sm text-gray-500 mr-4">Logged in as {user?.displayName || user?.email}</span>
             <div className="h-8 w-8 rounded-full flex items-center justify-center text-white font-bold" style={{ backgroundColor: content.theme.primaryColor }}>
-              {user?.name?.charAt(0) || 'A'}
+              {user?.displayName?.charAt(0) || user?.email?.charAt(0) || 'A'}
             </div>
           </div>
         </header>

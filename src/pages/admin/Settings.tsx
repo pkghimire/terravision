@@ -19,15 +19,17 @@ export default function Settings() {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
-    
-    setTimeout(() => {
-      updateContent('theme', theme);
-      setIsSaving(false);
+    try {
+      await updateContent('theme', theme);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
-    }, 800);
+    } catch (error) {
+      console.error("Save error:", error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
