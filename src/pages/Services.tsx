@@ -16,6 +16,12 @@ export default function Services() {
     Monitor: <Monitor className="w-8 h-8" />
   };
 
+  const defaultImages = [
+    'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&auto=format&fit=crop', // Satellite/Earth
+    'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000&auto=format&fit=crop', // Field/Nature
+    'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop'  // Dashboard/Data
+  ];
+
   return (
     <div>
       {/* Page Header */}
@@ -40,9 +46,9 @@ export default function Services() {
                 className={`flex flex-col lg:flex-row gap-12 items-center ${index % 2 !== 0 ? 'lg:flex-row-reverse' : ''}`}
               >
                 <div className="w-full lg:w-1/2">
-                  <div className="bg-gray-100 rounded-2xl aspect-w-16 aspect-h-10 overflow-hidden">
+                  <div className="bg-gray-100 rounded-2xl aspect-w-16 aspect-h-10 overflow-hidden shadow-lg">
                     <img 
-                      src={`https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&auto=format&fit=crop&sig=${index}`} 
+                      src={service.image || defaultImages[index % defaultImages.length]} 
                       alt={service.title}
                       className="object-cover w-full h-full"
                       referrerPolicy="no-referrer"

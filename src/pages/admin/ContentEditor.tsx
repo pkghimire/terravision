@@ -165,6 +165,21 @@ export default function ContentEditor() {
     }
   };
 
+  const handleServiceImageUpload = (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 800000) { // ~800KB
+        alert('Image is too large. Please choose an image under 800KB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        updateService(id, 'image', reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="bg-white shadow rounded-lg flex flex-col h-[calc(100vh-8rem)]">
       <div className="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
@@ -470,6 +485,27 @@ export default function ContentEditor() {
                     </div>
                     
                     <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Service Image</label>
+                        <div className="mb-2 h-32 w-full rounded overflow-hidden border border-gray-200 bg-gray-100">
+                          <img 
+                            src={service.image || [
+                              'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop',
+                              'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=800&auto=format&fit=crop',
+                              'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
+                            ][servicesData.indexOf(service) % 3]} 
+                            alt={service.title} 
+                            className="w-full h-full object-cover" 
+                            referrerPolicy="no-referrer" 
+                          />
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleServiceImageUpload(service.id, e)}
+                          className="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200"
+                        />
+                      </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Key Features</label>
                         <div className="space-y-2">

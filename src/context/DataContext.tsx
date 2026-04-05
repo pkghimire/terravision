@@ -37,6 +37,7 @@ export interface SiteContent {
     description: string;
     features: string[];
     icon: string;
+    image?: string;
   }>;
   blog: Array<{
     id: string;
@@ -102,6 +103,7 @@ const defaultContent: SiteContent = {
       description: 'Advanced analysis for environmental and social studies, including agriculture and infrastructure development focus, EIA, IEE, and GIS modeling.',
       features: ['Satellite Imagery Analysis', 'Land Cover Mapping', 'Change Detection'],
       icon: 'Globe',
+      image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop'
     },
     {
       id: '2',
@@ -109,6 +111,7 @@ const defaultContent: SiteContent = {
       description: 'Comprehensive field research and spatial surveys to gather accurate ground-truth data.',
       features: ['Topographical Surveys', 'Ecological Baselines', 'Socio-economic Surveys'],
       icon: 'Map',
+      image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=800&auto=format&fit=crop'
     },
     {
       id: '3',
@@ -116,6 +119,7 @@ const defaultContent: SiteContent = {
       description: 'Accessible, interactive deliverables including web maps and interactive dashboards.',
       features: ['Interactive Dashboards', 'Custom Web Applications', 'Comprehensive Reporting'],
       icon: 'Layers',
+      image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop'
     }
   ],
   blog: [
@@ -200,43 +204,73 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const unsubscribes: (() => void)[] = [];
     const loadedStatus: Record<string, boolean> = {};
 
-    sections.forEach(section => {
-      const sectionDoc = doc(db, 'content', section);
-      const unsubscribe = onSnapshot(sectionDoc, (snapshot) => {
-        if (snapshot.exists()) {
-          const sectionData = snapshot.data();
-          // Unwrap array if it was wrapped in an object
-          const finalData = (sectionData && sectionData.items && Array.isArray(sectionData.items)) 
-            ? sectionData.items 
-            : sectionData;
-            
-          setContent(prev => ({
-            ...prev,
-            [section]: finalData
-          }));
-        } else {
-          // Initialize section with default if it doesn't exist AND user is admin
-          // This prevents permission errors for public visitors
-          if (auth.currentUser?.email === 'payas4goog@gmail.com') {
-            const dataToSave = Array.isArray(defaultContent[section]) 
-              ? { items: defaultContent[section] } 
-              : defaultContent[section];
-              
-            setDoc(sectionDoc, dataToSave).catch(err => 
-              handleFirestoreError(err, OperationType.WRITE, `content/${section}`)
-            );
+    const loadData = async () => {
+      console.log("DataProvider: Initializing data loading...");
+      
+      // First, check if we need to migrate from content/main
+      let mainData: any = null;
+      if (auth.currentUser?.email === 'payas4goog@gmail.com') {
+        try {
+          const mainDocRef = doc(db, 'content', 'main');
+          const mainSnap = await getDoc(mainDocRef);
+          if (mainSnap.exists()) {
+            mainData = mainSnap.data();
+            console.log("Migration: Found legacy data in content/main. Will use for initialization if split docs are missing.");
           }
+        } catch (e) {
+          console.error("Error checking for migration data:", e);
         }
-        
-        loadedStatus[section] = true;
-        if (Object.keys(loadedStatus).length === sections.length) {
-          setLoading(false);
-        }
-      }, (error) => {
-        handleFirestoreError(error, OperationType.GET, `content/${section}`);
+      }
+
+      sections.forEach(section => {
+        const sectionDoc = doc(db, 'content', section);
+        const unsubscribe = onSnapshot(sectionDoc, async (snapshot) => {
+          if (snapshot.exists()) {
+            const sectionData = snapshot.data();
+            const finalData = (sectionData && sectionData.items && Array.isArray(sectionData.items)) 
+              ? sectionData.items 
+              : sectionData;
+              
+            setContent(prev => ({
+              ...prev,
+              [section]: finalData
+            }));
+          } else {
+            // Document doesn't exist. Try to migrate or use default.
+            if (auth.currentUser?.email === 'payas4goog@gmail.com') {
+              let dataToSave;
+              if (mainData && mainData[section]) {
+                console.log(`Migration: Initializing ${section} from legacy content/main...`);
+                dataToSave = Array.isArray(mainData[section]) 
+                  ? { items: mainData[section] } 
+                  : mainData[section];
+              } else {
+                console.log(`Migration: Initializing ${section} with default content.`);
+                dataToSave = Array.isArray(defaultContent[section]) 
+                  ? { items: defaultContent[section] } 
+                  : defaultContent[section];
+              }
+              
+              try {
+                await setDoc(sectionDoc, dataToSave);
+              } catch (err) {
+                console.error(`Error initializing ${section}:`, err);
+              }
+            }
+          }
+          
+          loadedStatus[section] = true;
+          if (Object.keys(loadedStatus).length === sections.length) {
+            setLoading(false);
+          }
+        }, (error) => {
+          handleFirestoreError(error, OperationType.GET, `content/${section}`);
+        });
+        unsubscribes.push(unsubscribe);
       });
-      unsubscribes.push(unsubscribe);
-    });
+    };
+
+    loadData();
 
     return () => unsubscribes.forEach(unsub => unsub());
   }, []);
